@@ -331,14 +331,21 @@ function word_click_event_do_text_text() {
 		ann = $(this).attr('data_ann');
 		
 	if ( status < 1 ) {
+        // New word
+        /*
 		run_overlib_status_unknown(WBLINK1,WBLINK2,WBLINK3,$(this).attr('title'),
 			TID,$(this).attr('data_order'),$(this).text(),$(this).attr('data_mw2'),
 			$(this).attr('data_mw3'),$(this).attr('data_mw4'),$(this).attr('data_mw5'),
 			$(this).attr('data_mw6'),$(this).attr('data_mw7'),$(this).attr('data_mw8'),
 			$(this).attr('data_mw9'),RTL);
+            */
 		top.frames['ro'].location.href='edit_word.php?tid=' + TID + '&ord=' + 
 			$(this).attr('data_order') + '&wid=';
-	}
+	} else if ( status >= 1 && status < 6 ) {
+        top.frames['ro'].location.href='edit_word.php?tid=' + TID + '&ord=' + 
+        $(this).attr('data_order') + '&wid=' + $(this).attr('data_wid');
+	
+    }
 	else if ( status == 99 )
 		run_overlib_status_99(WBLINK1,WBLINK2,WBLINK3,$(this).attr('title'),
 			TID,$(this).attr('data_order'),$(this).text(),$(this).attr('data_wid'),

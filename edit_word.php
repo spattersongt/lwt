@@ -231,7 +231,16 @@ else {  // if (! isset($_REQUEST['op']))
 		<input type="hidden" name="WoLgID" value="<?php echo $lang; ?>" />
 		<input type="hidden" name="WoTextLC" value="<?php echo tohtml($termlc); ?>" />
 		<input type="hidden" name="tid" value="<?php echo $_REQUEST['tid']; ?>" />
-		<input type="hidden" name="ord" value="<?php echo $_REQUEST['ord']; ?>" />
+        <input type="hidden" name="ord" value="<?php echo $_REQUEST['ord']; ?>" />
+
+<?php
+        if (isset($_REQUEST['trans'])) {
+            $transl = $_REQUEST['trans'];
+        } else{
+            $transl = '';
+        }
+        ?>
+    
 		<table class="tab2" cellspacing="0" cellpadding="5">
 		<tr title="Only change uppercase/lowercase!">
 		<td class="td1 right"><b>New Term:</b></td>
@@ -239,7 +248,7 @@ else {  // if (! isset($_REQUEST['op']))
 		</tr>
 		<tr>
 		<td class="td1 right">Translation:</td>
-		<td class="td1"><textarea name="WoTranslation" class="setfocus textarea-noreturn checklength" data_maxlength="500" data_info="Translation" cols="35" rows="3"></textarea></td>
+        <td class="td1"><textarea name="WoTranslation" class="setfocus textarea-noreturn checklength" data_maxlength="500" data_info="Translation" cols="35" rows="3"><?php echo tohtml($transl); ?></textarea></td>
 		</tr>
 		<tr>
 		<td class="td1 right">Tags:</td>
