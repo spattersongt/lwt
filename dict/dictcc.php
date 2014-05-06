@@ -1,6 +1,5 @@
 <html>
 <head>
-<script type="text/javascript" src="jquery-1.7.2.min.js"></script>
 </head>
 
 <body>
