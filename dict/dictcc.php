@@ -21,7 +21,7 @@ function setText(txt) {
     }
 
     href = parent.frames[i].location.href + '&trans=' + encodeURI(txt);
-    parent.frames[2].location.href = href;
+    parent.frames[i].location.href = href;
 }
 
 </script>
