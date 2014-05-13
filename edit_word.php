@@ -45,6 +45,22 @@ require_once( 'connect.inc.php' );
 require_once( 'dbutils.inc.php' );
 require_once( 'utilities.inc.php' );
 
+function save($langId, $woTextLC, $woText, $wordStatus, $sentence, $romanization, $translation)
+{
+    $message = runsql('insert into ' . $tbpref . 'words (WoLgID, WoTextLC, WoText, ' .
+        'WoStatus, WoTranslation, WoSentence, WoRomanization, WoStatusChanged,' .  make_score_random_insert_update('iv') . ') values( ' . 
+        $langId . ', ' .
+        convert_string_to_sqlsyntax($woTextLC) . ', ' .
+        convert_string_to_sqlsyntax($woText) . ', ' .  $wordStatus . ', ' .
+        convert_string_to_sqlsyntax($translation) . ', ' .
+        convert_string_to_sqlsyntax(repl_tab_nl($sentence)) . ', ' .
+        convert_string_to_sqlsyntax($romanization) . ', NOW(), ' .  
+        make_score_random_insert_update('id') . ')', "Term saved");
+
+    return $message;
+}
+
+
 $translation_raw = repl_tab_nl(getreq("WoTranslation"));
 if ( $translation_raw == '' ) $translation = '*';
 else $translation = $translation_raw;
@@ -68,17 +84,7 @@ if (isset($_REQUEST['op'])) {
 			$titletext = "New Term: " . tohtml(prepare_textdata($_REQUEST["WoTextLC"]));
 			pagestart_nobody($titletext);
 			echo '<h4><span class="bigger">' . $titletext . '</span></h4>';
-		
-			$message = runsql('insert into ' . $tbpref . 'words (WoLgID, WoTextLC, WoText, ' .
-				'WoStatus, WoTranslation, WoSentence, WoRomanization, WoStatusChanged,' .  make_score_random_insert_update('iv') . ') values( ' . 
-				$_REQUEST["WoLgID"] . ', ' .
-				convert_string_to_sqlsyntax($_REQUEST["WoTextLC"]) . ', ' .
-				convert_string_to_sqlsyntax($_REQUEST["WoText"]) . ', ' .
-				$_REQUEST["WoStatus"] . ', ' .
-				convert_string_to_sqlsyntax($translation) . ', ' .
-				convert_string_to_sqlsyntax(repl_tab_nl($_REQUEST["WoSentence"])) . ', ' .
-				convert_string_to_sqlsyntax($_REQUEST["WoRomanization"]) . ', NOW(), ' .  
-make_score_random_insert_update('id') . ')', "Term saved");
+            $message = save($_REQUEST['WoLgID'], $_REQUEST['WoTextLC'], $_REQUEST['WoText'], $_REQUEST['WoStatus'], $_REQUEST['WoSentence'], $_REQUEST['WoRomanization'], $translation);
 			$wid = get_last_key();
 			
 			$hex = strToClassName(prepare_textdata($_REQUEST["WoTextLC"]));
@@ -210,6 +216,31 @@ else {  // if (! isset($_REQUEST['op']))
 	
 	$new = (isset($wid) == FALSE);
 
+    /** Mmm tasty hack 
+      * 
+      * This comes from my dictionary wrapper.  User has clicked on a "new word" in the reading pane
+      *  then selected a translation from the dictionary wrapper.  The translation is sent here.  We
+      *  want to *SAVE* the translation (to minimize clicking. More speed!) and then 'convert' it to 
+      *  an edit word page */
+    if ($new && isset($_REQUEST['trans'])) {
+        // Copied from below unfortunately
+		$seid = get_first_value("select TiSeID as value from " . $tbpref . "textitems where TiTxID = " . $_REQUEST['tid'] . " and TiWordCount = 1 and TiOrder = " . $_REQUEST['ord']);
+        $sent = getSentence($seid, $termlc, (int) getSettingWithDefault('set-term-sentence-count'));
+
+        $message = save($lang, $termlc, $term, 1, $sent[1], "", $_REQUEST['trans']);
+        $wid = get_last_key();
+
+        // Change to the edit page.  
+        $new = FALSE;
+
+        $quickSaveFromDict = TRUE;
+
+
+    } else {
+        $quickSaveFromDict = FALSE;
+    }
+
+
 	$titletext = ($new ? "New Term" : "Edit Term") . ": " . tohtml($term);
 	pagestart_nobody($titletext);
 ?>
@@ -227,20 +258,12 @@ else {  // if (! isset($_REQUEST['op']))
 ?>
 	
 		<form name="newword" class="validate" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
-		<input type="hidden" name="fromAnn" value="<?php echo $fromAnn; ?>" />
+        <input type="hidden" name="fromAnn" value="<?php echo $fromAnn; ?>" />
 		<input type="hidden" name="WoLgID" value="<?php echo $lang; ?>" />
 		<input type="hidden" name="WoTextLC" value="<?php echo tohtml($termlc); ?>" />
 		<input type="hidden" name="tid" value="<?php echo $_REQUEST['tid']; ?>" />
         <input type="hidden" name="ord" value="<?php echo $_REQUEST['ord']; ?>" />
 
-<?php
-        if (isset($_REQUEST['trans'])) {
-            $transl = $_REQUEST['trans'];
-        } else{
-            $transl = '';
-        }
-        ?>
-    
 		<table class="tab2" cellspacing="0" cellpadding="5">
 		<tr title="Only change uppercase/lowercase!">
 		<td class="td1 right"><b>New Term:</b></td>
@@ -248,7 +271,7 @@ else {  // if (! isset($_REQUEST['op']))
 		</tr>
 		<tr>
 		<td class="td1 right">Translation:</td>
-        <td class="td1"><textarea name="WoTranslation" class="setfocus textarea-noreturn checklength" data_maxlength="500" data_info="Translation" cols="35" rows="3"><?php echo tohtml($transl); ?></textarea></td>
+        <td class="td1"><textarea name="WoTranslation" class="setfocus textarea-noreturn checklength" data_maxlength="500" data_info="Translation" cols="35" rows="3"></textarea></td>
 		</tr>
 		<tr>
 		<td class="td1 right">Tags:</td>
@@ -354,6 +377,26 @@ else {  // if (! isset($_REQUEST['op']))
 			</form>
 			<div id="exsent"><span class="click" onclick="do_ajax_show_sentences(<?php echo $lang; ?>, <?php echo prepare_textdata_js($termlc) . ', ' . prepare_textdata_js("document.forms['editword'].WoSentence"); ?>);"><img src="icn/sticky-notes-stack.png" title="Show Sentences" alt="Show Sentences" /> Show Sentences</span></div>	
 			<?php
+
+            if ($quickSaveFromDict) {
+                // A bit of code stolen from above to make the word not blue anymore
+                $hex = strToClassName(prepare_textdata($termlc));
+                ?>
+                    <script type="text/javascript">
+
+                    $(function() {
+                        var context = window.parent.frames['l'].document;
+                        var contexth = window.parent.frames['h'].document;
+                        var woid = <?php echo prepare_textdata_js($wid); ?>;
+                        var status = 1;
+                        var trans = <?php echo prepare_textdata_js($_REQUEST['trans'] . getWordTagList($wid,' ',1,0)); ?>;
+                        var roman = "";
+                        var title = make_tooltip(<?php echo prepare_textdata_js($term); ?>,trans,roman,status);
+                        $('.TERM<?php echo $hex; ?>', context).removeClass('status0').addClass('word' + woid + ' ' + 'status' + status).attr('data_trans',trans).attr('data_rom',roman).attr('data_status',status).attr('data_wid',woid).attr('title',title);
+                    });
+                    </script>
+                <?php
+            }
 		}
 		mysql_free_result($res);
 	}

@@ -61,33 +61,31 @@ span.status0 {
 	color: #000000;
 }
 span.status1 {
-	background-color: #F5B8A9;
+	background-color: #FFF365;
 	color: #000000;
 }
 span.status2 {
-	background-color: #F5CCA9;
+	background-color: #FFFFA0;
 	color: #000000;
 }
 span.status3 {
-	background-color: #F5E1A9;
+	background-color: #FFC;
 	color: #000000;
 }
 span.status4 {
-	background-color: #F5F3A9;
+	background-color: #FFC;
 	color: #000000;
 }
 span.status5 {
-	background-color: #DDFFDD;
+	background-color: #FFF;
 	color: #000000;
 }
 span.status99 {
-	background-color: #F8F8F8;
-	border-bottom: solid 2px #CCFFCC;  
+	background-color: #FFF;
 	color: #000000;
 }
 span.status98 {
-	background-color: #F8F8F8;
-	border-bottom: dashed 1px #000000; 
+	background-color: #FFF;
 	color: #000000;
 }
 span.mwsty {

@@ -7,7 +7,20 @@
 <script>
     
 function setText(txt) {
-    href = parent.frames[2].location.href + '&trans=' + encodeURI(txt);
+
+    /* Frame #2 works on the desktop but not on my iPad.  Frame 2 on the 
+     * iPad is the reading pane -- this is in multiple browsers too.. Weird
+     */
+    var i = 0;
+    for(i = 0; i < 4; i++) {
+        href = parent.frames[i].location.href;
+        if (href.search('edit_word.php') >= 0) {
+            // found the right frame
+            break;
+        }
+    }
+
+    href = parent.frames[i].location.href + '&trans=' + encodeURI(txt);
     parent.frames[2].location.href = href;
 }
 

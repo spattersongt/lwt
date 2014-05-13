@@ -43,6 +43,7 @@ var SOLUTION = '';
 var ADDFILTER = '';
 var RTL = 0;
 var ANN_ARRAY = {};
+var DOR=0;
  
 /**************************************************************
 LWT jQuery functions
@@ -378,6 +379,13 @@ function mword_click_event_do_text_text() {
 		$(this).attr('data_wid'), status,$(this).attr('data_code'), ann);
 	}
 	return false;
+}
+
+function text_onmousedown_event_do_text_text(e,txt)
+{
+    DOR=$(e).attr('data_order');
+    TID=txt;
+    //alert(txt);
 }
 
 function keydown_event_do_text_text(e) {

@@ -759,6 +759,7 @@ function selectmediapathoptions($dir) {
 				$ex = substr($entry,-4);
 				if ( (strcasecmp($ex, '.mp3') == 0) ||
 					(strcasecmp($ex, '.ogg') == 0) ||
+					(strcasecmp($ex, '.m4a') == 0) ||
 					(strcasecmp($ex, '.wav') == 0))
 					$r .= '<option value="' . tohtml($dir . '/' . $entry) . '">' . tohtml($dir . '/' . $entry) . '</option>';
 			}
