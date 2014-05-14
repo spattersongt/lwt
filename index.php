@@ -142,6 +142,71 @@ if (! areCookiesEnabled()) document.write('<p class="red">*** Cookies are not en
 	<br /><br /></li>
 <li><a href="settings.php">Settings/Preferences</a>
 
+<!-- Bookmarklet code.  See Bookmarklet.js.txt -->
+<style type="text/css" title="text/css">
+.bookmarklet {
+  padding-bottom: 0.6em;
+}
+
+.bookmarklet a {
+  display: block;
+  color: #0a0;
+  border: 2px solid #0a0;
+  background: #afa; 
+  font-size: 150%;
+  font-weight: 700;
+  text-decoration: none;
+  padding: 0.1em 0.5em;
+  float: left;
+}
+
+.bookmarklet a:hover {
+  color: #afa;
+  border-color: #595;
+  background: #0a0; 
+}
+</style>
+
+<div class="bookmarklet">
+  <a href="javascript:(function(e,a,g,h,f,c,b,d){if(!(f=e.jQuery)||g&gt;f.fn.jquery||h(f)){c=a.createElement(&quot;script&quot;);c.type=&quot;text/javascript&quot;;c.src=&quot;http://ajax.googleapis.com/ajax/libs/jquery/&quot;+g+&quot;/jquery.min.js&quot;;c.onload=c.onreadystatechange=function(){if(!b&amp;&amp;(!(d=this.readyState)||d==&quot;loaded&quot;||d==&quot;complete&quot;)){h((f=e.jQuery).noConflict(1),b=1);f(c).remove()}};a.documentElement.childNodes[0].appendChild(c)}})(window,document,&quot;1.8.0&quot;,function($,L){sel = (window.getSelection ?  window.getSelection() : document.getSelection ? document.getSelection() : document.selection.createRange().text); 
+
+cleanedSelection = String(sel).replace(/&quot;/g, '\\&quot;').replace(/\n/g, '\\n');
+
+
+var jQueryScript = document.createElement('script');
+jQueryScript.url = &quot;http://ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js&quot;;
+document.body.appendChild(jQueryScript);
+
+var script = document.createElement('script');
+script.type = 'text/javascript';
+script.text = '
+url = &quot;http://<?php echo $_SERVER["HTTP_HOST"]?>/lwt/edit_texts.php&quot;;
+
+data = { 
+&quot;TxLgID&quot;: &quot;1&quot;, 
+&quot;op&quot; : 
+&quot;Save and Return&quot;, 
+&quot;TxTitle&quot; : &quot;' + window.document.title + '&quot;,
+&quot;TxText&quot; : &quot;' + cleanedSelection + '&quot;,
+&quot;TxAudioURI&quot; : &quot;&quot;, 
+&quot;TxSourceURI&quot; : &quot;&quot; 
+};
+
+$.ajax({
+  type : &quot;POST&quot;,
+  url : url,
+  data : data,
+  success: function(response) {
+  window.location.href = &quot;http://<?php echo $_SERVER["HTTP_HOST"]?>/lwt/do_text.php?start=&quot; + response;
+  } 
+});
+';
+document.body.appendChild(script);});">LWT Import</a>
+  <div style="clear:both;"></div>
+</div>
+
+
+
 <?php
 // ********* WORDPRESS LOGOUT *********
 if (isset($_COOKIE['LWT-WP-User'])) {

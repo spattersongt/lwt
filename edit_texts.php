@@ -1,5 +1,8 @@
 <?php
 
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept');
+
 /**************************************************************
 "Learning with Texts" (LWT) is free and unencumbered software 
 released into the PUBLIC DOMAIN.
@@ -92,7 +95,7 @@ else {
 		$wh_tag = " having ((" . $wh_tag1 . ($currenttag12 ? ') AND (' : ') OR (') . $wh_tag2 . ')) ';
 }
 
-$no_pagestart = (getreq('markaction') == 'test' || getreq('markaction') == 'deltag' || substr(getreq('op'),-8) == 'and Open');
+$no_pagestart = (getreq('markaction') == 'test' || getreq('markaction') == 'deltag' || substr(getreq('op'),-8) == 'and Open' || substr(getreq('op'),-10) == 'and Return');
 
 if (! $no_pagestart) {
 	pagestart('My ' . getLanguage($currentlang) . ' Texts',true);
@@ -297,10 +300,16 @@ elseif (isset($_REQUEST['op'])) {
 			
 		$message = $message1 . " / " . $message2 . " / " . $message3 . " / Sentences added: " . get_first_value('select count(*) as value from ' . $tbpref . 'sentences where SeTxID = ' . $id) . " / Text items added: " . get_first_value('select count(*) as value from ' . $tbpref . 'textitems where TiTxID = ' . $id);
 		
-		if(substr($_REQUEST['op'],-8) == "and Open") {
+        if(substr($_REQUEST['op'],-8) == "and Open") {
 			header('Location: do_text.php?start=' . $id);
 			exit();
-		}
+        }
+
+        // Used with the bookmarklet
+        if(substr($_REQUEST['op'],-10) == "and Return") {
+            echo $id;
+            exit();
+        }
 	
 	}
 
