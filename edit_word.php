@@ -45,7 +45,7 @@ require_once( 'connect.inc.php' );
 require_once( 'dbutils.inc.php' );
 require_once( 'utilities.inc.php' );
 
-function save($langId, $woTextLC, $woText, $wordStatus, $sentence, $romanization, $translation)
+function save($tbpref, $langId, $woTextLC, $woText, $wordStatus, $sentence, $romanization, $translation)
 {
     $message = runsql('insert into ' . $tbpref . 'words (WoLgID, WoTextLC, WoText, ' .
         'WoStatus, WoTranslation, WoSentence, WoRomanization, WoStatusChanged,' .  make_score_random_insert_update('iv') . ') values( ' . 
@@ -84,7 +84,7 @@ if (isset($_REQUEST['op'])) {
 			$titletext = "New Term: " . tohtml(prepare_textdata($_REQUEST["WoTextLC"]));
 			pagestart_nobody($titletext);
 			echo '<h4><span class="bigger">' . $titletext . '</span></h4>';
-            $message = save($_REQUEST['WoLgID'], $_REQUEST['WoTextLC'], $_REQUEST['WoText'], $_REQUEST['WoStatus'], $_REQUEST['WoSentence'], $_REQUEST['WoRomanization'], $translation);
+            $message = save($tbpref, $_REQUEST['WoLgID'], $_REQUEST['WoTextLC'], $_REQUEST['WoText'], $_REQUEST['WoStatus'], $_REQUEST['WoSentence'], $_REQUEST['WoRomanization'], $translation);
 			$wid = get_last_key();
 			
 			$hex = strToClassName(prepare_textdata($_REQUEST["WoTextLC"]));
@@ -227,7 +227,7 @@ else {  // if (! isset($_REQUEST['op']))
 		$seid = get_first_value("select TiSeID as value from " . $tbpref . "textitems where TiTxID = " . $_REQUEST['tid'] . " and TiWordCount = 1 and TiOrder = " . $_REQUEST['ord']);
         $sent = getSentence($seid, $termlc, (int) getSettingWithDefault('set-term-sentence-count'));
 
-        $message = save($lang, $termlc, $term, 1, $sent[1], "", $_REQUEST['trans']);
+        $message = save($tbpref, $lang, $termlc, $term, 1, $sent[1], "", $_REQUEST['trans']);
         $wid = get_last_key();
 
         // Change to the edit page.  
